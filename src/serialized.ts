@@ -76,7 +76,7 @@ export interface IChangelogsFormattedOption {
 export const changelogsFormatted = (option: IChangelogsFormattedOption) => {
     try {
         const diff: JSONDiffPatch.Delta = CBOR.decode(option.diff)
-        return PlainOperational.changelogFormatted({
+        return PlainOperational.changelogsFormatted({
             diff,
             format: option.format,
             original: option.original,
@@ -162,6 +162,54 @@ export const reverse = (diff: string) => {
     try {
         const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
         return JSONDiffPatch.reverse(_diff)
+    } catch (e) {
+        return undefined
+    }
+}
+
+export const decodeDiff = (diff: string) => {
+    try {
+        const decoded: JSONDiffPatch.Delta = CBOR.decode(diff)
+        if (!decoded) throw new Error()
+        return decoded
+    } catch (e) {
+        return undefined
+    }
+}
+
+export const decodeDiffs = (diffs: string[]) => {
+    let decodedDiffs: JSONDiffPatch.Delta[] = []
+    try {
+        for (let diff of diffs) {
+            const decodedDiff = decodeDiff(diff)
+            if (!decodedDiff) throw new Error()
+            decodedDiffs.push(decodedDiff)
+        }
+        return decodedDiffs
+    } catch (e) {
+        return undefined
+    }
+}
+
+export const encodeDiff = (diff: JSONDiffPatch.Delta) => {
+    try {
+        const encoded: string = CBOR.encode(diff).toString('base64')
+        if (!encoded) throw new Error()
+        return encoded
+    } catch (e) {
+        return undefined
+    }
+}
+
+export const encodeDiffs = (diffs: JSONDiffPatch.Delta[]) => {
+    let encodedDiffs: string[] = []
+    try {
+        for (let diff of diffs) {
+            const encodedDiff = encodeDiff(diff)
+            if (!encodedDiff) throw new Error()
+            encodedDiffs.push(encodedDiff)
+        }
+        return encodedDiffs
     } catch (e) {
         return undefined
     }

@@ -22,7 +22,7 @@ export const moduleTest = async () => {
     const changelogs = Operational.changelogs(diffs[0], v1)
     console.log('\nchangelogs ->', changelogs)
 
-    const changelogsFormatted = Operational.changelogFormatted({
+    const changelogsFormatted = Operational.changelogsFormatted({
         diff: diffs[0],
         original: v1,
         format: 'html'

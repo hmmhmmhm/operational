@@ -68,7 +68,7 @@ export interface IChangelogsFormattedOption {
  * @param option
  * @returns string
  */
-export const changelogFormatted = (option: IChangelogsFormattedOption) => {
+export const changelogsFormatted = (option: IChangelogsFormattedOption) => {
     let result: string | undefined = undefined
     try {
         switch (option.format) {
@@ -117,7 +117,7 @@ export const patches = (object: any, diffs: JSONDiffPatch.Delta[]) => {
 
 /**
  * @description
- * Exclude multiple changes from objects.
+ * Exclude changes from objects.
  * 
  * @param right any
  * @param diff
