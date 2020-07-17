@@ -1,0 +1,26 @@
+{
+    "name": "operational",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+        "build": "tsc",
+        "start": "tsc && node dist/index.js",
+        "test": "tsc && node dist/test/index.js",
+        "clean": "rm -rf ./dist/*.*",
+        "lint": "prettier --write ./src/**/*.{ts}"
+    },
+    "main": "./dist/index.js",
+    "type": "./dist/index.d.ts",
+    "keywords": [],
+    "author": "hmmhmmhm",
+    "license": "MIT",
+    "dependencies": {
+        "cbor": "^5.0.2",
+        "jsondiffpatch": "^0.4.1"
+    },
+    "devDependencies": {
+        "@types/cbor": "^5.0.0",
+        "@types/node": "^14.0.23",
+        "prettier": "^2.0.5"
+    }
+}
