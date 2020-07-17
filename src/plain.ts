@@ -1,6 +1,8 @@
 import * as JSONDiffPatch from 'jsondiffpatch'
 
 /**
+ * @description
+ * Returns the changed value of the object.
  * 
  * @param left any
  * @param right any
@@ -9,6 +11,12 @@ export const diff = (left: any, right: any) => {
     return JSONDiffPatch.diff(left, right)
 }
 
+/**
+ * @description
+ * Returns the changed values of the object.
+ * 
+ * @param object any
+ */
 export const diffs = (object: any[]) => {
     const diffs: JSONDiffPatch.Delta[] = []
     for (let i = 0; i < (object.length - 1); i++) {
@@ -20,22 +28,25 @@ export const diffs = (object: any[]) => {
     return diffs
 }
 
-export interface IChangeLog {
+export interface IChangeLogs {
     op: 'add' | 'remove' | 'replace' | 'move'
     path: string
     value: any
 }
 
 /**
+ * @description
+ * Returns the changed content in
+ * JSON PATCH (RFC 6902) format.
  * 
- * @param delta 
- * @param original 
+ * @param diff
+ * @param original any
  * @returns It returns JSON PATCH (RFC 6902)
  */
-export const changelog = (diff: JSONDiffPatch.Delta, original: any) => {
+export const changelogs = (diff: JSONDiffPatch.Delta, original: any) => {
     try {
         // @ts-ignore
-        const result: IChangeLog[] = JSONDiffPatch.formatters.jsonpatch.format(diff, original)
+        const result: IChangeLogs[] = JSONDiffPatch.formatters.jsonpatch.format(diff, original)
         if (!result) throw new Error()
         return result
     } catch (e) {
@@ -50,6 +61,9 @@ export interface IChangelogsFormattedOption {
 }
 
 /**
+ * @description
+ * Returns the changed content in
+ * human readable log form.
  * 
  * @param option
  * @returns string
@@ -72,10 +86,24 @@ export const changelogFormatted = (option: IChangelogsFormattedOption) => {
     return result
 }
 
+/**
+ * @description
+ * Applies changes to objects.
+ * 
+ * @param left any
+ * @param diff
+ */
 export const patch = (left: any, diff: JSONDiffPatch.Delta) => {
     return JSONDiffPatch.patch(left, diff)
 }
 
+/**
+ * @description
+ * Applies multiple changes to objects.
+ * 
+ * @param left any
+ * @param diffs
+ */
 export const patches = (object: any, diffs: JSONDiffPatch.Delta[]) => {
     let patched: any = object
     try {
@@ -87,10 +115,24 @@ export const patches = (object: any, diffs: JSONDiffPatch.Delta[]) => {
     return patched
 }
 
+/**
+ * @description
+ * Exclude multiple changes from objects.
+ * 
+ * @param right any
+ * @param diff
+ */
 export const unpatch = (right: any, diff: JSONDiffPatch.Delta) => {
     return JSONDiffPatch.unpatch(right, diff)
 }
 
+/**
+ * @description
+ * Exclude multiple changes from objects.
+ * 
+ * @param right any
+ * @param diff
+ */
 export const unpatches = (object: any, diffs: JSONDiffPatch.Delta[]) => {
     let patched: any = undefined
     try {
@@ -102,6 +144,12 @@ export const unpatches = (object: any, diffs: JSONDiffPatch.Delta[]) => {
     return patched
 }
 
-export const reverse = (diff) => {
+/**
+ * @description
+ * Reverse the diff order.
+ * 
+ * @param diff
+ */
+export const reverse = (diff: JSONDiffPatch.Delta) => {
     return JSONDiffPatch.reverse(diff)
 }

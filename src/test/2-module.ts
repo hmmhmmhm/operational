@@ -1,4 +1,4 @@
-import * as Operational from '../plain'
+import { Operational } from '../'
 import {
     v1,
     v2,
@@ -22,7 +22,7 @@ export const moduleTest = async () => {
     const changelogs = Operational.changelogs(diffs[0], v1)
     console.log('\nchangelogs ->', changelogs)
 
-    const changelogsFormatted = Operational.changelogsFormatted({
+    const changelogsFormatted = Operational.changelogFormatted({
         diff: diffs[0],
         original: v1,
         format: 'html'
