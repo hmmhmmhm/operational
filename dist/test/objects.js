@@ -1,55 +1,56 @@
-
+"use strict";
+exports.__esModule = true;
 // * ORIGIN
-export const v1 = {
+exports.v1 = {
     same: 'just exist',
     name: 'v1'
-}
+};
 // * UPDATE
-export const v2 = {
+exports.v2 = {
     same: 'just exist',
     name: 'v2'
-}
+};
 // * ADD
-export const v3 = {
+exports.v3 = {
     same: 'just exist',
     name: 'v3',
-    option: 'in v3',
-}
+    option: 'in v3'
+};
 // * DELETE
-export const v4 = {
+exports.v4 = {
     same: 'just exist',
-    name: 'v4',
-}
+    name: 'v4'
+};
 // * ARRAY & MAP
-export const v5 = {
+exports.v5 = {
     same: 'just exist',
     name: 'v4',
     array: ['a', 'b', 'c'],
     map: {
         a: '1',
         b: '2',
-        c: '3',
+        c: '3'
     }
-}
+};
 // * NOTHING
-export const v6 = {
+exports.v6 = {
     same: 'just exist',
     name: 'v4',
     array: ['a', 'b', 'c'],
     map: {
         a: '1',
         b: '2',
-        c: '3',
+        c: '3'
     }
-}
+};
 // * STRING
-export const v7 = {
+exports.v7 = {
     same: 'just check exist new cheker',
     name: 'v4',
     array: ['a', 'b', 'c'],
     map: {
         a: '1',
         b: '2',
-        c: '3',
+        c: '3'
     }
-}
+};

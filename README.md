@@ -1,2 +1,1 @@
-# typescript-template
-Pure Typescript Template
+# Operational

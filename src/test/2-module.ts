@@ -35,5 +35,5 @@ export const moduleTest = async () => {
     const multiplePatched = Operational.patches(v1, diffs)
     console.log('\nmultiple patched', multiplePatched)
 
-    console.log('\ndiffs', JSON.stringify(diffs, null, 4))
+    // console.log('\ndiffs', JSON.stringify(diffs, null, 4))
 }

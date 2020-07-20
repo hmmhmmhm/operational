@@ -1,7 +1,7 @@
 import CBOR from 'cbor'
 import * as PlainOperational from './plain'
 import * as JSONDiffPatch from 'jsondiffpatch'
-
+import { CustomizedDiffPatch } from './diff'
 /**
  * @description
  * Returns the changed value of the object.
@@ -96,7 +96,7 @@ export const changelogsFormatted = (option: IChangelogsFormattedOption) => {
 export const patch = (left: any, diff: string) => {
     try {
         const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
-        return JSONDiffPatch.patch(left, _diff)
+        return CustomizedDiffPatch.patch(left, _diff)
     } catch (e) {
         return undefined
     }
@@ -114,7 +114,7 @@ export const patches = (object: any, diffs: string[]) => {
     try {
         for (let diff of diffs) {
             const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
-            patched = JSONDiffPatch.patch(patched, _diff)
+            patched = CustomizedDiffPatch.patch(patched, _diff)
         }
     } catch (e) {
         return undefined
@@ -131,7 +131,7 @@ export const patches = (object: any, diffs: string[]) => {
  */
 export const unpatch = (right: any, diff: string) => {
     const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
-    return JSONDiffPatch.unpatch(right, _diff)
+    return CustomizedDiffPatch.unpatch(right, _diff)
 }
 
 /**
@@ -146,7 +146,7 @@ export const unpatches = (object: any, diffs: string[]) => {
     try {
         for (let diff of diffs) {
             const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
-            patched = JSONDiffPatch.unpatch(patched, _diff)
+            patched = CustomizedDiffPatch.unpatch(patched, _diff)
         }
     } catch (e) { }
     return patched
@@ -161,7 +161,7 @@ export const unpatches = (object: any, diffs: string[]) => {
 export const reverse = (diff: string) => {
     try {
         const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
-        return JSONDiffPatch.reverse(_diff)
+        return CustomizedDiffPatch.reverse(_diff)
     } catch (e) {
         return undefined
     }

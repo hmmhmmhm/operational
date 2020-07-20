@@ -15,6 +15,7 @@
     "author": "hmmhmmhm",
     "license": "MIT",
     "dependencies": {
+        "automerge": "^0.14.1",
         "cbor": "^5.0.2",
         "jsondiffpatch": "^0.4.1"
     },

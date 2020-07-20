@@ -1,4 +1,5 @@
 import * as JSONDiffPatch from 'jsondiffpatch'
+import { CustomizedDiffPatch } from './diff'
 
 /**
  * @description
@@ -8,7 +9,7 @@ import * as JSONDiffPatch from 'jsondiffpatch'
  * @param right any
  */
 export const diff = (left: any, right: any) => {
-    return JSONDiffPatch.diff(left, right)
+    return CustomizedDiffPatch.diff(left, right)
 }
 
 /**
@@ -22,7 +23,7 @@ export const diffs = (object: any[]) => {
     for (let i = 0; i < (object.length - 1); i++) {
         const left = object[i]
         const right = object[i + 1]
-        const diffObject = JSONDiffPatch.diff(left, right)
+        const diffObject = CustomizedDiffPatch.diff(left, right)
         if (diffObject) diffs.push(diffObject)
     }
     return diffs
@@ -46,7 +47,7 @@ export interface IChangeLogs {
 export const changelogs = (diff: JSONDiffPatch.Delta, original: any) => {
     try {
         // @ts-ignore
-        const result: IChangeLogs[] = JSONDiffPatch.formatters.jsonpatch.format(diff, original)
+        const result: IChangeLogs[] = CustomizedDiffPatch.formatters.jsonpatch.format(diff, original)
         if (!result) throw new Error()
         return result
     } catch (e) {
@@ -94,7 +95,7 @@ export const changelogsFormatted = (option: IChangelogsFormattedOption) => {
  * @param diff
  */
 export const patch = (left: any, diff: JSONDiffPatch.Delta) => {
-    return JSONDiffPatch.patch(left, diff)
+    return CustomizedDiffPatch.patch(left, diff)
 }
 
 /**
@@ -108,7 +109,7 @@ export const patches = (object: any, diffs: JSONDiffPatch.Delta[]) => {
     let patched: any = object
     try {
         for (let diff of diffs)
-            patched = JSONDiffPatch.patch(patched, diff)
+            patched = CustomizedDiffPatch.patch(patched, diff)
     } catch (e) {
         return undefined
     }
@@ -123,7 +124,7 @@ export const patches = (object: any, diffs: JSONDiffPatch.Delta[]) => {
  * @param diff
  */
 export const unpatch = (right: any, diff: JSONDiffPatch.Delta) => {
-    return JSONDiffPatch.unpatch(right, diff)
+    return CustomizedDiffPatch.unpatch(right, diff)
 }
 
 /**
@@ -137,7 +138,7 @@ export const unpatches = (object: any, diffs: JSONDiffPatch.Delta[]) => {
     let patched: any = undefined
     try {
         for (let diff of diffs)
-            patched = JSONDiffPatch.unpatch(patched, diff)
+            patched = CustomizedDiffPatch.unpatch(patched, diff)
     } catch (e) {
         return undefined
     }
@@ -151,5 +152,5 @@ export const unpatches = (object: any, diffs: JSONDiffPatch.Delta[]) => {
  * @param diff
  */
 export const reverse = (diff: JSONDiffPatch.Delta) => {
-    return JSONDiffPatch.reverse(diff)
+    return CustomizedDiffPatch.reverse(diff)
 }

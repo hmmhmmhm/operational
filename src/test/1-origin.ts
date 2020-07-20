@@ -1,4 +1,4 @@
-import * as JSONDiffPatch from 'jsondiffpatch'
+import { CustomizedDiffPatch } from '../diff'
 import {
     v1,
     v2,
@@ -6,6 +6,7 @@ import {
     v4,
     v5,
     v6,
+    v7,
 } from './objects'
 
 export interface ISnapshotOption {
@@ -14,7 +15,7 @@ export interface ISnapshotOption {
 }
 
 export const snapshot = (option: ISnapshotOption) => {
-    return JSONDiffPatch.diff(option.old, option.new)
+    return CustomizedDiffPatch.diff(option.old, option.new)
 }
 
 export const originTest = async () => {
@@ -43,4 +44,9 @@ export const originTest = async () => {
         new: v6,
     })
     console.log('DIFF v5->v6', diff5)
+    const diff6 = snapshot({
+        old: v6,
+        new: v7,
+    })
+    console.log('DIFF v6->v7', diff6)
 }
