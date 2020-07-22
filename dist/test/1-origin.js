@@ -36,7 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var diff_1 = require("../diff");
+var diff_1 = require("../diff/diff");
 var objects_1 = require("./objects");
 exports.snapshot = function (option) {
     return diff_1.CustomizedDiffPatch.diff(option.old, option["new"]);

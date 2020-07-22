@@ -1,4 +1,4 @@
-import { Operational } from '../'
+import { Diff } from '../index'
 import {
     v1,
     v2,
@@ -9,7 +9,7 @@ import {
 } from './objects'
 
 export const moduleTest = async () => {
-    const diffs = Operational.diffs([
+    const diffs = Diff.Operational.diffs([
         v1,
         v2,
         v3,
@@ -19,20 +19,20 @@ export const moduleTest = async () => {
     ])
     console.log('\ndiffs ->', diffs)
 
-    const changelogs = Operational.changelogs(diffs[0], v1)
+    const changelogs = Diff.Operational.changelogs(diffs[0], v1)
     console.log('\nchangelogs ->', changelogs)
 
-    const changelogsFormatted = Operational.changelogsFormatted({
+    const changelogsFormatted = Diff.Operational.changelogsFormatted({
         diff: diffs[0],
         original: v1,
         format: 'html'
     })
     console.log('\nchangelogsFormatted ->\n', changelogsFormatted)
 
-    const patched = Operational.patch(v1, diffs[0])
+    const patched = Diff.Operational.patch(v1, diffs[0])
     console.log('\nsingle patched', patched)
 
-    const multiplePatched = Operational.patches(v1, diffs)
+    const multiplePatched = Diff.Operational.patches(v1, diffs)
     console.log('\nmultiple patched', multiplePatched)
 
     // console.log('\ndiffs', JSON.stringify(diffs, null, 4))

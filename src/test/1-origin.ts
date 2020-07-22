@@ -1,4 +1,4 @@
-import { CustomizedDiffPatch } from '../diff'
+import { CustomizedDiffPatch } from '../diff/diff'
 import {
     v1,
     v2,

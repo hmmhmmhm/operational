@@ -35,33 +35,21 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 exports.__esModule = true;
-var Automerge = __importStar(require("automerge"));
+// import * as Automerge from 'automerge'
+var index_1 = require("../index");
 exports.mergeTest = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var origin, doc1, doc2, changes, doc3;
+    var store;
     return __generator(this, function (_a) {
-        origin = { text: 'Hello World' };
-        doc1 = Automerge.from(origin);
-        doc1 = Automerge.change(doc1, function (doc) {
-            doc.text = 'Hello New World';
-            doc.user1Toggle = true;
+        store = index_1.Store.writable({
+            changed: '0'
         });
-        doc2 = Automerge.from(origin);
-        console.log('doc1', Automerge.save(doc1));
-        doc2 = Automerge.change(doc2, function (doc) {
-            doc.text = 'Hello World!!';
-            doc.user2Toggle = true;
+        store.subscribe(function (changedStore) {
+            console.log('changedStore', changedStore);
         });
-        changes = Automerge.getAllChanges(doc1);
-        doc3 = Automerge.merge(doc1, doc2);
-        console.log(doc3);
+        store.set({
+            changed: '1'
+        });
         return [2 /*return*/];
     });
 }); };

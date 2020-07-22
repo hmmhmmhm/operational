@@ -36,12 +36,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var __1 = require("../");
+var index_1 = require("../index");
 var objects_1 = require("./objects");
 exports.moduleTest = function () { return __awaiter(void 0, void 0, void 0, function () {
     var diffs, changelogs, changelogsFormatted, patched, multiplePatched;
     return __generator(this, function (_a) {
-        diffs = __1.Operational.diffs([
+        console.log(index_1.Diff);
+        console.log(index_1.Diff.Operational);
+        diffs = index_1.Diff.Operational.diffs([
             objects_1.v1,
             objects_1.v2,
             objects_1.v3,
@@ -50,17 +52,17 @@ exports.moduleTest = function () { return __awaiter(void 0, void 0, void 0, func
             objects_1.v6,
         ]);
         console.log('\ndiffs ->', diffs);
-        changelogs = __1.Operational.changelogs(diffs[0], objects_1.v1);
+        changelogs = index_1.Diff.Operational.changelogs(diffs[0], objects_1.v1);
         console.log('\nchangelogs ->', changelogs);
-        changelogsFormatted = __1.Operational.changelogsFormatted({
+        changelogsFormatted = index_1.Diff.Operational.changelogsFormatted({
             diff: diffs[0],
             original: objects_1.v1,
             format: 'html'
         });
         console.log('\nchangelogsFormatted ->\n', changelogsFormatted);
-        patched = __1.Operational.patch(objects_1.v1, diffs[0]);
+        patched = index_1.Diff.Operational.patch(objects_1.v1, diffs[0]);
         console.log('\nsingle patched', patched);
-        multiplePatched = __1.Operational.patches(objects_1.v1, diffs);
+        multiplePatched = index_1.Diff.Operational.patches(objects_1.v1, diffs);
         console.log('\nmultiple patched', multiplePatched);
         return [2 /*return*/];
     });

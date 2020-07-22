@@ -1,5 +1,5 @@
-import * as Interface from './interface'
-import * as Utils from './utils'
+import * as Interface from '../interface'
+import * as Utils from '../utils'
 
 const subscriberQueue: any[] = []
 
@@ -49,7 +49,7 @@ export class Writable<T> implements Interface.Writable<T> {
         this.subscribers.push(subscriber)
         if (this.subscribers.length === 1)
             this.stop = this.start(this.set) || Utils.noop
-        Utils.run(this.value)
+        if (this.value) run(this.value)
 
         return () => {
             const index = this.subscribers.indexOf(subscriber)

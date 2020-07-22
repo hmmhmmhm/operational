@@ -1,5 +1,5 @@
-import * as Interface from './interface'
-import * as Utils from './utils'
+import * as Interface from '../interface'
+import * as Utils from '../utils'
 import { Writable } from './writable'
 import { Readable } from './readable'
 

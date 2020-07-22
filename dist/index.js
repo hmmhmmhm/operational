@@ -7,19 +7,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 exports.__esModule = true;
-var _Operational = __importStar(require("./plain"));
-var _SerializedOperational = __importStar(require("./serialized"));
-/**
- * @description
- * A collection of functions to manage changes in objects.
- * Changed values are tracked in object form.
- */
-var Operational = _Operational;
-exports.Operational = Operational;
-/**
- * @description
- * A collection of functions to manage changes in objects.
- * Changed values are tracked in string form.
- */
-var SerializedOperational = _SerializedOperational;
-exports.SerializedOperational = SerializedOperational;
+var Interface = __importStar(require("./interface"));
+exports.Interface = Interface;
+var Store = __importStar(require("./store"));
+exports.Store = Store;
+var Diff = __importStar(require("./diff"));
+exports.Diff = Diff;
