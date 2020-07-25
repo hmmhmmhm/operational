@@ -1,9 +1,10 @@
 import * as Interface from '../interface'
 import * as SerializedOperational from '../diff/serialized'
+import { type } from 'os'
 
 export interface IRecord<T> {
-    undo: (diff?: T) => void
-    redo: (diff?: T) => void
+    undo: (diff?: T) => boolean
+    redo: (diff?: T) => boolean
     startRecording: (limit?: number) => void
     stopRecording: () => void
     isRecording: () => boolean
@@ -14,7 +15,7 @@ export interface IRecord<T> {
 }
 
 export interface IRecordOption<T, StoreType> {
-    store: Interface.Readable<StoreType>
+    store: Interface.Writable<StoreType>
     load?: () => Promise<T[]>
     save?: (records: T[]) => Promise<boolean>
 }
@@ -28,8 +29,32 @@ export class Record<StoreType> implements IRecord<string> {
     constructor(option: IRecordOption<string, StoreType>) {
         this.option = option
     }
+
     undo(diff?: string) {
-        // 
+
+        const storeValue = this.option.store.get()
+        if (!storeValue) return false
+
+        if (!this.isRecording()) return false
+        if (!diff) {
+            const recordDiff = this.records.pop()
+            if (!recordDiff) return false
+
+            try {
+                const undoApplied =
+                    SerializedOperational.unpatch(
+                        storeValue,
+                        recordDiff
+                    )
+
+                // @ts-ignore
+                undoApplied.____ignoreRecordByOperational = true
+                this.option.store.set(undoApplied)
+            } catch (e) {
+                return false
+            }
+        }
+        return true
     }
     redo(diff: string) {
         //
@@ -45,6 +70,7 @@ export class Record<StoreType> implements IRecord<string> {
         this.stopRecording()
         this.stopRecorder =
             this.option.store.subscribe((changedStoreValue) => {
+                if (typeof changedStoreValue['____ignoreRecordByOperational'] != 'undefined') return
                 if (!this.beforeStoreValue) {
                     this.beforeStoreValue = changedStoreValue
                     return
@@ -54,13 +80,14 @@ export class Record<StoreType> implements IRecord<string> {
                         this.beforeStoreValue,
                         changedStoreValue
                     )
+                    if (!diff) return
+                    this.records.push(diff)
                 } catch (e) {
                     return
                 }
             })
     }
     stopRecording() {
-        // return records
         if (this.stopRecorder != undefined) {
             this.stopRecorder()
             this.stopRecorder = undefined
