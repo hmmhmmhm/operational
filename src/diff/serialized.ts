@@ -129,9 +129,9 @@ export const patches = (object: any, diffs: string[]) => {
  * @param right any
  * @param diff string
  */
-export const unpatch = <T>(right: T, diff: string) => {
+export const unpatch = (right: any, diff: string) => {
     const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
-    return CustomizedDiffPatch.unpatch(right, _diff) as T
+    return CustomizedDiffPatch.unpatch(right, _diff)
 }
 
 /**

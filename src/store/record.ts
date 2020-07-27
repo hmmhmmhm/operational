@@ -1,6 +1,6 @@
 import * as Interface from '../interface'
 import * as SerializedOperational from '../diff/serialized'
-import { type } from 'os'
+import { EventEmitter } from 'events'
 
 export interface IRecord<T> {
     undo: (diff?: T) => boolean
@@ -20,50 +20,130 @@ export interface IRecordOption<T, StoreType> {
     save?: (records: T[]) => Promise<boolean>
 }
 
+export interface IRecordEvent {
+    on(
+        event: 'recordIndexChanged',
+        listener: (
+            currentRecordIndex: number,
+            status: 'undo' | 'redo' | 'new' | 'calibrate'
+        ) => void,
+    ): this,
+
+    on(
+        event: 'recordsChanged',
+        listener: (
+            records: string[],
+            status: 'new' | 'calibrate'
+        ) => void,
+    ): this,
+}
+
 export class Record<StoreType> implements IRecord<string> {
     public option: IRecordOption<string, StoreType>
     protected records: string[] = []
+    protected currentRecordIndex: number = -1
     protected stopRecorder?: Interface.Unsubscriber
     protected beforeStoreValue: any
+    protected event: EventEmitter & IRecordEvent = new EventEmitter()
 
     constructor(option: IRecordOption<string, StoreType>) {
         this.option = option
     }
 
+    private set(value: any) {
+        value.____ignoreRecordByOperational = true
+        this.option.store.set(value)
+    }
+
     undo(diff?: string) {
+        if (!this.isCanUndo()) return false
 
         const storeValue = this.option.store.get()
         if (!storeValue) return false
 
-        if (!this.isRecording()) return false
-        if (!diff) {
-            const recordDiff = this.records.pop()
-            if (!recordDiff) return false
-
+        if (diff) {
             try {
                 const undoApplied =
                     SerializedOperational.unpatch(
                         storeValue,
-                        recordDiff
+                        diff
                     )
-
-                // @ts-ignore
-                undoApplied.____ignoreRecordByOperational = true
-                this.option.store.set(undoApplied)
+                this.set(undoApplied)
+                return true
             } catch (e) {
                 return false
             }
         }
-        return true
+
+        const recordDiff = this.records[--this.currentRecordIndex]
+        if (!recordDiff) return false
+
+        this.event.emit(
+            'recordIndexChanged',
+            this.currentRecordIndex,
+            'undo'
+        )
+
+        try {
+            const undoApplied =
+                SerializedOperational.unpatch(
+                    storeValue,
+                    recordDiff
+                )
+            this.set(undoApplied)
+            return true
+        } catch (e) {
+            return false
+        }
     }
     redo(diff: string) {
-        //
+        if (!this.isCanRedo()) return false
+
+        const storeValue = this.option.store.get()
+        if (!storeValue) return false
+
+        if (diff) {
+            try {
+                const redoApplied =
+                    SerializedOperational.patch(
+                        storeValue,
+                        diff
+                    )
+                this.set(redoApplied)
+                return true
+            } catch (e) {
+                return false
+            }
+        }
+
+        const recordDiff = this.records[++this.currentRecordIndex]
+        if (!recordDiff) return false
+
+        this.event.emit(
+            'recordIndexChanged',
+            this.currentRecordIndex,
+            'redo'
+        )
+
+        try {
+            const redoApplied =
+                SerializedOperational.patch(
+                    storeValue,
+                    recordDiff
+                )
+            this.set(redoApplied)
+            return true
+        } catch (e) {
+            return false
+        }
     }
     isCanUndo() {
-        //
+        if (!this.isRecording()) return false
+        return (this.currentRecordIndex) <= 0
     }
     isCanRedo() {
-        //
+        if (!this.isRecording()) return false
+        return (this.currentRecordIndex + 1) > (this.records.length - 1)
     }
 
     startRecording(limit?: number) {
@@ -81,7 +161,27 @@ export class Record<StoreType> implements IRecord<string> {
                         changedStoreValue
                     )
                     if (!diff) return
+
+                    if (this.currentRecordIndex == -1) {
+                        this.currentRecordIndex = 0
+                    } else if (this.currentRecordIndex != this.records.length) {
+                        this.records = this.records.slice(0, this.currentRecordIndex)
+                        this.currentRecordIndex += 1
+                    } else {
+                        this.currentRecordIndex += 1
+                    }
+                    this.event.emit(
+                        'recordIndexChanged',
+                        this.currentRecordIndex,
+                        'new'
+                    )
+
                     this.records.push(diff)
+                    this.event.emit(
+                        'recordsChanged',
+                        this.records,
+                        'new'
+                    )
                 } catch (e) {
                     return
                 }
@@ -123,7 +223,15 @@ export class Record<StoreType> implements IRecord<string> {
     getRecords() {
         return this.records
     }
+    getRecord(index: number) {
+        return this.records[index]
+    }
     clearRecords() {
-        //
+        this.records = []
+        this.currentRecordIndex = -1
+    }
+
+    getEvent() {
+        return this.event
     }
 }
