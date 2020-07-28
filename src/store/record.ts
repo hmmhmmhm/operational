@@ -36,6 +36,14 @@ export interface IRecordEvent {
             status: 'new' | 'calibrate'
         ) => void,
     ): this,
+
+    on(
+        event: 'recordCleared',
+        listener: (
+            records: string[],
+            currentRecordIndex: number,
+        ) => void,
+    ): this,
 }
 
 export class Record<StoreType> implements IRecord<string> {
@@ -246,6 +254,11 @@ export class Record<StoreType> implements IRecord<string> {
     clearRecords() {
         this.records = []
         this.currentRecordIndex = -1
+        this.event.emit(
+            'recordCleared',
+            this.records,
+            this.currentRecordIndex,
+        )
     }
 
     getEvent() {
