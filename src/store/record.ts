@@ -59,7 +59,7 @@ export class Record<StoreType> implements IRecord<string> {
         this.option = option
     }
 
-    private set(value: any) {
+    setWithNoRecord(value: any) {
         value.____ignoreRecordByOperational = true
         this.option.store.set(value)
     }
@@ -77,7 +77,7 @@ export class Record<StoreType> implements IRecord<string> {
                         storeValue,
                         diff
                     )
-                this.set(undoApplied)
+                this.setWithNoRecord(undoApplied)
                 return true
             } catch (e) {
                 return false
@@ -99,7 +99,7 @@ export class Record<StoreType> implements IRecord<string> {
                     storeValue,
                     recordDiff
                 )
-            this.set(undoApplied)
+            this.setWithNoRecord(undoApplied)
             return true
         } catch (e) {
             return false
@@ -118,7 +118,7 @@ export class Record<StoreType> implements IRecord<string> {
                         storeValue,
                         diff
                     )
-                this.set(redoApplied)
+                this.setWithNoRecord(redoApplied)
                 return true
             } catch (e) {
                 return false
@@ -140,7 +140,7 @@ export class Record<StoreType> implements IRecord<string> {
                     storeValue,
                     recordDiff
                 )
-            this.set(redoApplied)
+            this.setWithNoRecord(redoApplied)
             return true
         } catch (e) {
             return false
