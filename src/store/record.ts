@@ -44,6 +44,7 @@ export class Record<StoreType> implements IRecord<string> {
     protected currentRecordIndex: number = -1
     protected stopRecorder?: Interface.Unsubscriber
     protected beforeStoreValue: any
+    protected limit?: number
     protected event: EventEmitter & IRecordEvent = new EventEmitter()
 
     constructor(option: IRecordOption<string, StoreType>) {
@@ -148,6 +149,7 @@ export class Record<StoreType> implements IRecord<string> {
 
     startRecording(limit?: number) {
         this.stopRecording()
+        this.limit = limit
         this.stopRecorder =
             this.option.store.subscribe((changedStoreValue) => {
                 if (typeof changedStoreValue['____ignoreRecordByOperational'] != 'undefined') return
@@ -182,9 +184,24 @@ export class Record<StoreType> implements IRecord<string> {
                         this.records,
                         'new'
                     )
-                } catch (e) {
-                    return
-                }
+
+                    if (this.limit) {
+                        while (this.limit < this.records.length) {
+                            this.records.pop()
+                            this.event.emit(
+                                'recordsChanged',
+                                this.records,
+                                'calibrate'
+                            )
+                            this.currentRecordIndex -= 1
+                            this.event.emit(
+                                'recordIndexChanged',
+                                this.currentRecordIndex,
+                                'calibrate'
+                            )
+                        }
+                    }
+                } catch (e) { }
             })
     }
     stopRecording() {
