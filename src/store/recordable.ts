@@ -18,6 +18,7 @@ export interface IRecordableOption<T, StoreType> {
     store: Interface.Writable<StoreType>
     load?: () => Promise<T[]>
     save?: (records: T[]) => Promise<boolean>
+    autostart: boolean
 }
 
 export interface IRecordableEvent {
@@ -57,6 +58,8 @@ export class Recordable<StoreType> implements IRecordable<string> {
 
     constructor(option: IRecordableOption<string, StoreType>) {
         this.option = option
+        if (this.option.autostart)
+            this.startRecording()
     }
 
     get() {

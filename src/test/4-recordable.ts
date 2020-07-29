@@ -9,6 +9,5 @@ export const recordableTest = async () => {
         name: 'Player 1',
     })
 
-    // playerStore.startRecording()
     console.log('\nhi?')
 }

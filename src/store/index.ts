@@ -90,10 +90,12 @@ export const recordable = <T>(
     value: T,
     load?: () => Promise<string[]>,
     save?: (records: string[]) => Promise<boolean>,
+    autostart: boolean = true,
 ) => {
     return new Recordable<T>({
         store: writable(value),
         load,
         save,
+        autostart,
     })
 }
