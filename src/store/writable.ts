@@ -43,7 +43,8 @@ export class Writable<T> implements Interface.Writable<T> {
 
     subscribe(
         run: Interface.Subscriber<T>,
-        invalidate: Interface.Invalidator<T> = Utils.noop): Interface.Unsubscriber {
+        invalidate: Interface.Invalidator<T> = Utils.noop
+    ): Interface.Unsubscriber {
 
         const subscriber: Interface.SubscribeInvalidateTuple<T> = [run, invalidate]
         this.subscribers.push(subscriber)

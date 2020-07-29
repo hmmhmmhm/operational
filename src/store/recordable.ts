@@ -1,6 +1,7 @@
 import * as Interface from '../interface'
 import * as SerializedOperational from '../diff/serialized'
 import { EventEmitter } from 'events'
+import * as Utils from '../utils'
 
 export interface IRecordable<T> {
     undo: (diff?: T) => boolean
@@ -73,6 +74,27 @@ export class Recordable<StoreType> implements IRecordable<string> {
     setWithNoRecord(newValue: StoreType & { ____ignoreRecordByOperational }) {
         newValue.____ignoreRecordByOperational = true
         this.option.store.set(newValue)
+    }
+
+    update(callback: Interface.Updater<StoreType>) {
+        this.option.store.update(callback)
+    }
+
+    updateWithNoRecord(callback: Interface.Updater<StoreType>) {
+        this.option.store.update(() => {
+            const changedValue = callback()
+
+            // @ts-ignore
+            changedValue.____ignoreRecordByOperational = true
+            return changedValue
+        })
+    }
+
+    subscribe(
+        run: Interface.Subscriber<StoreType>,
+        invalidate: Interface.Invalidator<StoreType> = Utils.noop
+    ) {
+        return this.option.store.subscribe(run, invalidate)
     }
 
     undo(diff?: string) {
