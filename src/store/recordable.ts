@@ -72,7 +72,9 @@ export class Recordable<StoreType> implements IRecordable<string> {
     }
 
     setWithNoRecord(newValue: StoreType & { ____ignoreRecordByOperational }) {
-        newValue.____ignoreRecordByOperational = true
+        if (newValue) {
+            newValue.____ignoreRecordByOperational = true
+        }
         this.option.store.set(newValue)
     }
 
@@ -84,8 +86,10 @@ export class Recordable<StoreType> implements IRecordable<string> {
         this.option.store.update(() => {
             const changedValue = callback()
 
-            // @ts-ignore
-            changedValue.____ignoreRecordByOperational = true
+            if (changedValue) {
+                // @ts-ignore
+                changedValue.____ignoreRecordByOperational = true
+            }
             return changedValue
         })
     }
@@ -193,7 +197,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
         this.limit = limit
         this.stopRecorder =
             this.option.store.subscribe((changedStoreValue) => {
-                if (typeof changedStoreValue['____ignoreRecordByOperational'] != 'undefined') return
+                if (changedStoreValue && typeof changedStoreValue['____ignoreRecordByOperational'] != 'undefined') return
                 if (!this.beforeStoreValue) {
                     this.beforeStoreValue = changedStoreValue
                     return

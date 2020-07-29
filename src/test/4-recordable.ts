@@ -9,5 +9,9 @@ export const recordableTest = async () => {
         name: 'Player 1',
     })
 
-    console.log('\nhi?')
+    playerStore.update((beforeValue) => {
+        beforeValue.x += 20
+    })
+
+    console.log('\nchanged store value:', playerStore.get())
 }
