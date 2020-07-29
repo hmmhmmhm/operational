@@ -2,7 +2,7 @@ import * as Interface from '../interface'
 import * as SerializedOperational from '../diff/serialized'
 import { EventEmitter } from 'events'
 
-export interface IRecord<T> {
+export interface IRecordable<T> {
     undo: (diff?: T) => boolean
     redo: (diff?: T) => boolean
     startRecording: (limit?: number) => void
@@ -14,13 +14,13 @@ export interface IRecord<T> {
     clearRecords: () => void
 }
 
-export interface IRecordOption<T, StoreType> {
+export interface IRecordableOption<T, StoreType> {
     store: Interface.Writable<StoreType>
     load?: () => Promise<T[]>
     save?: (records: T[]) => Promise<boolean>
 }
 
-export interface IRecordEvent {
+export interface IRecordableEvent {
     on(
         event: 'recordIndexChanged',
         listener: (
@@ -46,22 +46,30 @@ export interface IRecordEvent {
     ): this,
 }
 
-export class Record<StoreType> implements IRecord<string> {
-    public option: IRecordOption<string, StoreType>
+export class Recordable<StoreType> implements IRecordable<string> {
+    protected option: IRecordableOption<string, StoreType>
     protected records: string[] = []
     protected currentRecordIndex: number = -1
     protected stopRecorder?: Interface.Unsubscriber
     protected beforeStoreValue: any
     protected limit?: number
-    protected event: EventEmitter & IRecordEvent = new EventEmitter()
+    protected event: EventEmitter & IRecordableEvent = new EventEmitter()
 
-    constructor(option: IRecordOption<string, StoreType>) {
+    constructor(option: IRecordableOption<string, StoreType>) {
         this.option = option
     }
 
-    setWithNoRecord(value: any) {
-        value.____ignoreRecordByOperational = true
-        this.option.store.set(value)
+    get() {
+        return this.option.store.get()
+    }
+
+    set(newValue: StoreType) {
+        this.option.store.set(newValue)
+    }
+
+    setWithNoRecord(newValue: StoreType & { ____ignoreRecordByOperational }) {
+        newValue.____ignoreRecordByOperational = true
+        this.option.store.set(newValue)
     }
 
     undo(diff?: string) {
