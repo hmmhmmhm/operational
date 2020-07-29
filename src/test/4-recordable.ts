@@ -8,10 +8,17 @@ export const recordableTest = async () => {
         z: 0,
         name: 'Player 1',
     })
+    console.log('\ncurrent store value:', playerStore.get())
+    console.log('is can undo', playerStore.isCanUndo())
 
     playerStore.update((beforeValue) => {
         beforeValue.x += 20
+        return beforeValue
     })
 
-    console.log('\nchanged store value:', playerStore.get())
+    console.log('changed store value:', playerStore.get())
+    console.log('is can undo', playerStore.isCanUndo())
+    playerStore.undo()
+    console.log('undo store value:', playerStore.get())
+    console.log('is can undo', playerStore.isCanUndo())
 }

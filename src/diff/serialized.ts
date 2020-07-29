@@ -52,7 +52,9 @@ export const diffs = (object: any[]) => {
  */
 export const changelogs = (diff: string, original: any) => {
     try {
-        const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
+        const _diff: JSONDiffPatch.Delta = CBOR.decode(
+            Buffer.from(diff, 'base64')
+        )
         return PlainOperational.changelogs(_diff, original)
     } catch (e) {
         return undefined
@@ -75,7 +77,9 @@ export interface IChangelogsFormattedOption {
  */
 export const changelogsFormatted = (option: IChangelogsFormattedOption) => {
     try {
-        const diff: JSONDiffPatch.Delta = CBOR.decode(option.diff)
+        const diff: JSONDiffPatch.Delta = CBOR.decode(
+            Buffer.from(option.diff, 'base64')
+        )
         return PlainOperational.changelogsFormatted({
             diff,
             format: option.format,
@@ -95,7 +99,9 @@ export const changelogsFormatted = (option: IChangelogsFormattedOption) => {
  */
 export const patch = (left: any, diff: string) => {
     try {
-        const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
+        const _diff: JSONDiffPatch.Delta = CBOR.decode(
+            Buffer.from(diff, 'base64')
+        )
         return CustomizedDiffPatch.patch(left, _diff)
     } catch (e) {
         return undefined
@@ -113,7 +119,9 @@ export const patches = (object: any, diffs: string[]) => {
     let patched: any = object
     try {
         for (let diff of diffs) {
-            const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
+            const _diff: JSONDiffPatch.Delta = CBOR.decode(
+                Buffer.from(diff, 'base64')
+            )
             patched = CustomizedDiffPatch.patch(patched, _diff)
         }
     } catch (e) {
@@ -130,7 +138,9 @@ export const patches = (object: any, diffs: string[]) => {
  * @param diff string
  */
 export const unpatch = (right: any, diff: string) => {
-    const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
+    const _diff: JSONDiffPatch.Delta = CBOR.decode(
+        Buffer.from(diff, 'base64')
+    )
     return CustomizedDiffPatch.unpatch(right, _diff)
 }
 
@@ -145,7 +155,9 @@ export const unpatches = (object: any, diffs: string[]) => {
     let patched: any = undefined
     try {
         for (let diff of diffs) {
-            const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
+            const _diff: JSONDiffPatch.Delta = CBOR.decode(
+                Buffer.from(diff, 'base64')
+            )
             patched = CustomizedDiffPatch.unpatch(patched, _diff)
         }
     } catch (e) { }
@@ -160,7 +172,9 @@ export const unpatches = (object: any, diffs: string[]) => {
  */
 export const reverse = (diff: string) => {
     try {
-        const _diff: JSONDiffPatch.Delta = CBOR.decode(diff)
+        const _diff: JSONDiffPatch.Delta = CBOR.decode(
+            Buffer.from(diff, 'base64')
+        )
         return CustomizedDiffPatch.reverse(_diff)
     } catch (e) {
         return undefined
@@ -169,7 +183,9 @@ export const reverse = (diff: string) => {
 
 export const decodeDiff = (diff: string) => {
     try {
-        const decoded: JSONDiffPatch.Delta = CBOR.decode(diff)
+        const decoded: JSONDiffPatch.Delta = CBOR.decode(
+            Buffer.from(diff, 'base64')
+        )
         if (!decoded) throw new Error()
         return decoded
     } catch (e) {

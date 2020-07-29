@@ -121,7 +121,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
             }
         }
 
-        const recordDiff = this.records[--this.currentRecordIndex]
+        const recordDiff = this.records[this.currentRecordIndex--]
         if (!recordDiff) return false
 
         this.event.emit(
@@ -131,14 +131,17 @@ export class Recordable<StoreType> implements IRecordable<string> {
         )
 
         try {
+            console.log('can we hi', storeValue, recordDiff)
             const undoApplied =
                 SerializedOperational.unpatch(
                     storeValue,
                     recordDiff
                 )
+            console.log('can we', undoApplied)
             this.setWithNoRecord(undoApplied)
             return true
         } catch (e) {
+            console.log(e)
             return false
         }
     }
@@ -162,7 +165,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
             }
         }
 
-        const recordDiff = this.records[++this.currentRecordIndex]
+        const recordDiff = this.records[this.currentRecordIndex++]
         if (!recordDiff) return false
 
         this.event.emit(
@@ -185,7 +188,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
     }
     isCanUndo() {
         if (!this.isRecording()) return false
-        return (this.currentRecordIndex) <= 0
+        return (this.currentRecordIndex) >= 0
     }
     isCanRedo() {
         if (!this.isRecording()) return false
@@ -199,7 +202,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
             this.option.store.subscribe((changedStoreValue) => {
                 if (changedStoreValue && typeof changedStoreValue['____ignoreRecordByOperational'] != 'undefined') return
                 if (!this.beforeStoreValue) {
-                    this.beforeStoreValue = changedStoreValue
+                    this.beforeStoreValue = JSON.parse(JSON.stringify(changedStoreValue))
                     return
                 }
                 try {
