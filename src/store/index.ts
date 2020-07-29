@@ -2,6 +2,7 @@ import * as Interface from '../interface'
 import * as Utils from '../utils'
 import { Writable } from './writable'
 import { Readable } from './readable'
+import { Recordable } from './recordable'
 
 /**
  * Create a `Writable` store that allows both updating and reading by subscription.
@@ -82,5 +83,17 @@ export function derived<T>(stores: Interface.Stores, callback: Function, initial
             Utils.runAll(unsubscribers)
             cleanup()
         }
+    })
+}
+
+export const recordable = <T>(
+    value: T,
+    load?: () => Promise<string[]>,
+    save?: (records: string[]) => Promise<boolean>,
+) => {
+    return new Recordable<T>({
+        store: writable(value),
+        load,
+        save,
     })
 }
