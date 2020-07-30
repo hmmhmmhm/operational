@@ -10,7 +10,7 @@ export const recordableTest = async () => {
 
     console.log('\ninit player store:', playerStore.get())
     console.log('is can undo', playerStore.isCanUndo())
-
+    console.log('is can redo', playerStore.isCanRedo())
 
     playerStore.update((beforeValue) => {
         beforeValue.x += 20
@@ -19,9 +19,13 @@ export const recordableTest = async () => {
 
     console.log('\nchanged player store:', playerStore.get())
     console.log('is can undo', playerStore.isCanUndo())
+    console.log('is can redo', playerStore.isCanRedo())
 
 
     playerStore.undo()
     console.log('\nundo applied player store:', playerStore.get())
     console.log('is can undo', playerStore.isCanUndo())
+    console.log('is can redo', playerStore.isCanRedo())
+
+
 }

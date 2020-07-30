@@ -121,7 +121,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
             }
         }
 
-        const recordDiff = this.records[this.currentRecordIndex--]
+        const recordDiff = this.records[--this.currentRecordIndex]
         if (!recordDiff) return false
 
         this.event.emit(
@@ -163,7 +163,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
             }
         }
 
-        const recordDiff = this.records[this.currentRecordIndex++]
+        const recordDiff = this.records[++this.currentRecordIndex]
         if (!recordDiff) return false
 
         this.event.emit(
@@ -186,11 +186,12 @@ export class Recordable<StoreType> implements IRecordable<string> {
     }
     isCanUndo() {
         if (!this.isRecording()) return false
-        return (this.currentRecordIndex) >= 0
+        return (this.currentRecordIndex) > 0
     }
     isCanRedo() {
         if (!this.isRecording()) return false
-        return (this.currentRecordIndex + 1) > (this.records.length - 1)
+        if (this.records.length == 0) return false
+        return this.currentRecordIndex < this.records.length
     }
 
     startRecording(limit?: number) {
@@ -214,7 +215,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
                     if (!diff) return
 
                     if (this.currentRecordIndex == -1) {
-                        this.currentRecordIndex = 0
+                        this.currentRecordIndex = 1
                     } else if (this.currentRecordIndex != this.records.length) {
                         this.records = this.records.slice(0, this.currentRecordIndex)
                         this.currentRecordIndex += 1
