@@ -212,6 +212,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
                         this.beforeStoreValue,
                         changedStoreValue
                     )
+                    this.beforeStoreValue = JSON.parse(JSON.stringify(changedStoreValue))
                     if (!diff) return
 
                     if (this.currentRecordIndex == -1) {
@@ -292,6 +293,9 @@ export class Recordable<StoreType> implements IRecordable<string> {
     }
     getRecord(index: number) {
         return this.records[index]
+    }
+    getCurrentRecordIndex() {
+        return this.currentRecordIndex
     }
     clearRecords() {
         this.records = []
