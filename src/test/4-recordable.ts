@@ -27,5 +27,6 @@ export const recordableTest = async () => {
     console.log('is can undo', playerStore.isCanUndo())
     console.log('is can redo', playerStore.isCanRedo())
 
-
+    playerStore.redo()
+    console.log('\nredo applied player store:', playerStore.get())
 }

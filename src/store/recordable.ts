@@ -143,7 +143,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
             return false
         }
     }
-    redo(diff: string) {
+    redo(diff?: string) {
         if (!this.isCanRedo()) return false
 
         const storeValue = this.option.store.get()
@@ -163,7 +163,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
             }
         }
 
-        const recordDiff = this.records[++this.currentRecordIndex]
+        const recordDiff = this.records[this.currentRecordIndex++]
         if (!recordDiff) return false
 
         this.event.emit(
