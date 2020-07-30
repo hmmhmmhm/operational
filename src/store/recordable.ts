@@ -9,7 +9,7 @@ export interface IRecordable<T> {
     startRecording: (limit?: number) => void
     stopRecording: () => void
     isRecording: () => boolean
-    load: (ecordData?: Interface.IRecordData<T>) => Promise<boolean>
+    load: (recordData?: Interface.IRecordData<T>) => Promise<boolean>
     save: () => Promise<undefined | Interface.IRecordData<T>>
     getRecords: () => string[] | undefined
     clearRecords: () => void
@@ -17,7 +17,7 @@ export interface IRecordable<T> {
 
 export interface IRecordableOption<T, StoreType> {
     store: Interface.Writable<StoreType>
-    load?: (recordData?: Interface.IRecordData<T>) => Promise<T[]>
+    load?: (recordData?: Interface.IRecordData<T>) => Promise<undefined | Interface.IRecordData<T>>
     save?: (recordData: Interface.IRecordData<T>) => Promise<undefined | Interface.IRecordData<T>>
     autostart: boolean
 }
@@ -270,13 +270,18 @@ export class Recordable<StoreType> implements IRecordable<string> {
             try {
                 const loadedRecords = await this.option.load()
                 if (!loadedRecords) return false
-                this.records = loadedRecords
+
+                this.records = loadedRecords.records
+                this.currentRecordIndex = loadedRecords.currentRecordIndex
+                this.option.store.set(loadedRecords.storeValue)
                 return true
             } catch (e) {
                 return false
             }
         } else {
             this.records = recordData.records
+            this.currentRecordIndex = recordData.currentRecordIndex
+            this.option.store.set(recordData.storeValue)
         }
         return true
     }
@@ -284,11 +289,13 @@ export class Recordable<StoreType> implements IRecordable<string> {
         if (!this.option.save) return {
             records: this.records,
             currentRecordIndex: this.currentRecordIndex,
+            storeValue: this.option.store.get()
         }
         try {
             await this.option.save({
                 records: this.records,
                 currentRecordIndex: this.currentRecordIndex,
+                storeValue: this.option.store.get()
             })
         } catch (e) { }
         return

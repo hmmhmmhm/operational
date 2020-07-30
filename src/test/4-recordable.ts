@@ -110,6 +110,14 @@ export const recordableTest = async () => {
     console.log('\nre startRecording test', roomStore.getRecords(), roomStore.get())
 
     // * Save and Load
-    const recordData = await roomStore.save()
-    console.log('\nsave test', recordData)
+    const recordedData = await roomStore.save()
+    console.log('\nsave test', recordedData)
+
+    const clonedStore = Store.recordable<any>({})
+    clonedStore.load(recordedData)
+    console.log(
+        '\nre clonedStore test',
+        clonedStore.getRecords(),
+        clonedStore.get(),
+        clonedStore.getCurrentRecordIndex())
 }

@@ -43,4 +43,5 @@ export type StoresValues<T> = T extends Readable<infer U> ? U :
 export interface IRecordData<T> {
 	records: T[],
 	currentRecordIndex: number,
+	storeValue: any
 }

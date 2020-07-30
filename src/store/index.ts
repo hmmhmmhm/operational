@@ -88,7 +88,7 @@ export function derived<T>(stores: Interface.Stores, callback: Function, initial
 
 export const recordable = <T>(
     value: T,
-    load?: (recordData?: Interface.IRecordData<string>) => Promise<string[]>,
+    load?: (recordData?: Interface.IRecordData<string>) => Promise<undefined | Interface.IRecordData<string>>,
     save?: (recordData: Interface.IRecordData<string>) => Promise<undefined | Interface.IRecordData<string>>,
     autostart: boolean = true,
 ) => {
