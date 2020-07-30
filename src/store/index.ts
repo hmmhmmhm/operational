@@ -88,8 +88,8 @@ export function derived<T>(stores: Interface.Stores, callback: Function, initial
 
 export const recordable = <T>(
     value: T,
-    load?: () => Promise<string[]>,
-    save?: (records: string[]) => Promise<boolean>,
+    load?: (recordData?: Interface.IRecordData<string>) => Promise<string[]>,
+    save?: (recordData: Interface.IRecordData<string>) => Promise<undefined | Interface.IRecordData<string>>,
     autostart: boolean = true,
 ) => {
     return new Recordable<T>({

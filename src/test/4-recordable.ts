@@ -8,6 +8,7 @@ export const recordableTest = async () => {
         name: 'Player 1',
     })
 
+    // * Single Undo and Redo
     console.log('\ninit player store:', playerStore.get())
     console.log('is can undo', playerStore.isCanUndo())
     console.log('is can redo', playerStore.isCanRedo())
@@ -43,7 +44,7 @@ export const recordableTest = async () => {
     console.log('is can redo', playerStore.isCanRedo())
 
 
-
+    // * Multiple Undo and Redo
     const roomStore = Store.recordable<any>({
         room1: [],
         room2: [],
@@ -94,6 +95,21 @@ export const recordableTest = async () => {
     roomStore.redo()
     console.log('\nredo(3/3) room store', roomStore.get())
 
-    // roomStore.saveRecords()
-    // roomStore.stopRecording()
+    // * Stop and restart
+    roomStore.stopRecording()
+    roomStore.update((value) => {
+        value.room2.push({
+            name: 'User4',
+            age: 40,
+        })
+        return value
+    })
+    console.log('\nstopRecording test', roomStore.getRecords(), roomStore.get())
+
+    roomStore.startRecording()
+    console.log('\nre startRecording test', roomStore.getRecords(), roomStore.get())
+
+    // * Save and Load
+    const recordData = await roomStore.save()
+    console.log('\nsave test', recordData)
 }

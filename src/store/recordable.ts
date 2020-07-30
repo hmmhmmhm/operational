@@ -9,16 +9,16 @@ export interface IRecordable<T> {
     startRecording: (limit?: number) => void
     stopRecording: () => void
     isRecording: () => boolean
-    loadRecords: (previouslyRecords?: T[]) => Promise<boolean>
-    saveRecords: () => Promise<boolean>
+    load: (ecordData?: Interface.IRecordData<T>) => Promise<boolean>
+    save: () => Promise<undefined | Interface.IRecordData<T>>
     getRecords: () => string[] | undefined
     clearRecords: () => void
 }
 
 export interface IRecordableOption<T, StoreType> {
     store: Interface.Writable<StoreType>
-    load?: () => Promise<T[]>
-    save?: (records: T[]) => Promise<boolean>
+    load?: (recordData?: Interface.IRecordData<T>) => Promise<T[]>
+    save?: (recordData: Interface.IRecordData<T>) => Promise<undefined | Interface.IRecordData<T>>
     autostart: boolean
 }
 
@@ -264,8 +264,8 @@ export class Recordable<StoreType> implements IRecordable<string> {
     isRecording() {
         return this.stopRecorder != undefined
     }
-    async loadRecords(previouslyRecords?: string[]) {
-        if (!previouslyRecords) {
+    async load(recordData?: Interface.IRecordData<string>) {
+        if (!recordData || !recordData.records) {
             if (!this.option.load) return false
             try {
                 const loadedRecords = await this.option.load()
@@ -276,17 +276,22 @@ export class Recordable<StoreType> implements IRecordable<string> {
                 return false
             }
         } else {
-            this.records = previouslyRecords
+            this.records = recordData.records
         }
         return true
     }
-    async saveRecords() {
-        if (!this.option.save) return false
-        try {
-            return await this.option.save(this.records)
-        } catch (e) {
-            return false
+    async save() {
+        if (!this.option.save) return {
+            records: this.records,
+            currentRecordIndex: this.currentRecordIndex,
         }
+        try {
+            await this.option.save({
+                records: this.records,
+                currentRecordIndex: this.currentRecordIndex,
+            })
+        } catch (e) { }
+        return
     }
     getRecords() {
         return this.records
