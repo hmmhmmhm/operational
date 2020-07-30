@@ -131,13 +131,11 @@ export class Recordable<StoreType> implements IRecordable<string> {
         )
 
         try {
-            console.log('can we hi', storeValue, recordDiff)
             const undoApplied =
                 SerializedOperational.unpatch(
                     storeValue,
                     recordDiff
                 )
-            console.log('can we', undoApplied)
             this.setWithNoRecord(undoApplied)
             return true
         } catch (e) {
@@ -200,7 +198,10 @@ export class Recordable<StoreType> implements IRecordable<string> {
         this.limit = limit
         this.stopRecorder =
             this.option.store.subscribe((changedStoreValue) => {
-                if (changedStoreValue && typeof changedStoreValue['____ignoreRecordByOperational'] != 'undefined') return
+                if (changedStoreValue && typeof changedStoreValue['____ignoreRecordByOperational'] != 'undefined') {
+                    delete changedStoreValue['____ignoreRecordByOperational']
+                    return
+                }
                 if (!this.beforeStoreValue) {
                     this.beforeStoreValue = JSON.parse(JSON.stringify(changedStoreValue))
                     return

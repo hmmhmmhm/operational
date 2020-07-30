@@ -1,4 +1,3 @@
-// import * as Automerge from 'automerge'
 import { Store } from '../'
 
 export const recordableTest = async () => {
@@ -8,17 +7,21 @@ export const recordableTest = async () => {
         z: 0,
         name: 'Player 1',
     })
-    console.log('\ncurrent store value:', playerStore.get())
+
+    console.log('\ninit player store:', playerStore.get())
     console.log('is can undo', playerStore.isCanUndo())
+
 
     playerStore.update((beforeValue) => {
         beforeValue.x += 20
         return beforeValue
     })
 
-    console.log('changed store value:', playerStore.get())
+    console.log('\nchanged player store:', playerStore.get())
     console.log('is can undo', playerStore.isCanUndo())
+
+
     playerStore.undo()
-    console.log('undo store value:', playerStore.get())
+    console.log('\nundo applied player store:', playerStore.get())
     console.log('is can undo', playerStore.isCanUndo())
 }
