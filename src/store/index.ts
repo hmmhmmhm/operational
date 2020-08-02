@@ -86,16 +86,40 @@ export function derived<T>(stores: Interface.Stores, callback: Function, initial
     })
 }
 
+/**
+ * Creates a store where changes are recorded.
+ * @param {T}value initial value
+ * @param option 
+ * @example
+ * // Normal Usage
+ * const store = Store.recordable<any>({})
+ * 
+ * // Advanced Usage
+ * const storeOption = {
+ *     load: (recordData) => {}, // (optional)
+ *     save: (recordData) => {}, // (optional)
+ *     autostart: true, // (optional)
+ *     limit: 10 // (optional)
+ * }
+ * const store = Store.recordable<any>(
+ *     {}, // initial value
+ *     storeOption,
+ * )
+ */
 export const recordable = <T>(
     value: T,
-    load?: (recordData?: Interface.IRecordData<string>) => Promise<undefined | Interface.IRecordData<string>>,
-    save?: (recordData: Interface.IRecordData<string>) => Promise<undefined | Interface.IRecordData<string>>,
-    autostart: boolean = true,
+    option?: {
+        load?: (recordData?: Interface.IRecordData<string>) => Promise<undefined | Interface.IRecordData<string>>,
+        save?: (recordData: Interface.IRecordData<string>) => Promise<undefined | Interface.IRecordData<string>>,
+        autostart?: boolean,
+        limit?: number
+    }
 ) => {
     return new Recordable<T>({
         store: writable(value),
-        load,
-        save,
-        autostart,
+        load: option?.load,
+        save: option?.save,
+        autostart: (option && option.autostart !== undefined) ? option.autostart : true,
+        limit: option?.limit,
     })
 }

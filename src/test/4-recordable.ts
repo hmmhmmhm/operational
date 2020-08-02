@@ -1,4 +1,5 @@
 import { Store } from '../'
+import { STATUS_CODES } from 'http'
 
 export const recordableTest = async () => {
     const playerStore = Store.recordable<any>({
@@ -45,6 +46,8 @@ export const recordableTest = async () => {
 
 
     // * Multiple Undo and Redo
+
+
     const roomStore = Store.recordable<any>({
         room1: [],
         room2: [],
@@ -95,6 +98,7 @@ export const recordableTest = async () => {
     roomStore.redo()
     console.log('\nredo(3/3) room store', roomStore.get())
 
+
     // * Stop and restart
     roomStore.stopRecording()
     roomStore.update((value) => {
@@ -109,15 +113,122 @@ export const recordableTest = async () => {
     roomStore.startRecording()
     console.log('\nre startRecording test', roomStore.getRecords(), roomStore.get())
 
+
     // * Save and Load
     const recordedData = await roomStore.save()
     console.log('\nsave test', recordedData)
 
     const clonedStore = Store.recordable<any>({})
     clonedStore.load(recordedData)
+
     console.log(
         '\nre clonedStore test',
         clonedStore.getRecords(),
         clonedStore.get(),
         clonedStore.getCurrentRecordIndex())
+
+    clonedStore.undo()
+    console.log('\nundo clonedStore', roomStore.get(),
+        clonedStore.getCurrentRecordIndex())
+
+    clonedStore.redo()
+    console.log('\nredo clonedStore', roomStore.get(),
+        clonedStore.getCurrentRecordIndex())
+
+
+    // * Record clean test
+    const limitedStore = Store.recordable<any>({
+        room1: [],
+        room2: [],
+    }, {
+        limit: 2,
+    })
+    console.log('\n\nlimitedStore', limitedStore.get(), limitedStore.getRecords())
+
+    limitedStore.update((value) => {
+        value.room2.push({
+            name: 'User1',
+        })
+        return value
+    })
+    limitedStore.update((value) => {
+        value.room2.push({
+            name: 'User2',
+        })
+        return value
+    })
+    console.log('limitedStore 2 diff', limitedStore.getRecords())
+    limitedStore.update((value) => {
+        value.room2.push({
+            name: 'User3',
+            age: 33
+        })
+        return value
+    })
+    console.log('limitedStore 3 diff', limitedStore.getRecords())
+
+    // * 값 3번 넣고 undo 두번 한다음 새로 값 넣으면 이전 diff 잘 사라지나 확인
+    // limitedStore.clearRecords()
+    const newestStore = Store.recordable<any>({
+        states: [],
+    })
+
+    newestStore.update((value) => {
+        //
+        value.states.push('ACT 1')
+        return value
+    })
+    newestStore.update((value) => {
+        //
+        value.states.push('ACT 2')
+        return value
+    })
+    newestStore.update((value) => {
+        //
+        value.states.push('ACT 3')
+        return value
+    })
+    console.log(
+        'newest diff check',
+        newestStore.getRecords(),
+        newestStore.getCurrentRecordIndex(),
+        newestStore.get()
+    )
+    newestStore.undo()
+    newestStore.undo()
+    console.log(
+        'newest diff check',
+        newestStore.getRecords(),
+        newestStore.getCurrentRecordIndex(),
+        newestStore.get()
+    )
+    newestStore.update((value) => {
+        //
+        value.states.push('ACT 4')
+        return value
+    })
+    console.log(
+        'newest diff check',
+        newestStore.getRecords(),
+        newestStore.getCurrentRecordIndex(),
+        newestStore.get()
+    )
+    console.log(
+        'changelog',
+        newestStore.changelogs(
+            newestStore.getRecords()[1],
+            newestStore.get(),
+        )
+    )
+    console.log(
+        'changelog',
+        newestStore.changelogsFormatted(
+            newestStore.getRecords()[1],
+            'html',
+            newestStore.get(),
+        )
+    )
+    console.log('isRecording', newestStore.isRecording())
+    newestStore.clearRecords()
+    console.log(newestStore.getRecords())
 }

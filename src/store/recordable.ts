@@ -20,6 +20,7 @@ export interface IRecordableOption<T, StoreType> {
     load?: (recordData?: Interface.IRecordData<T>) => Promise<undefined | Interface.IRecordData<T>>
     save?: (recordData: Interface.IRecordData<T>) => Promise<undefined | Interface.IRecordData<T>>
     autostart: boolean
+    limit?: number
 }
 
 export interface IRecordableEvent {
@@ -60,17 +61,35 @@ export class Recordable<StoreType> implements IRecordable<string> {
     constructor(option: IRecordableOption<string, StoreType>) {
         this.option = option
         if (this.option.autostart)
-            this.startRecording()
+            this.startRecording(this.option.limit)
     }
 
+    /**
+     * Returns the value of the store.
+     * @returns StoreValue
+     * @example
+     * store.get()
+     */
     get() {
         return this.option.store.get()
     }
 
+    /**
+     * Set the store value to that value.
+     * @param newValue
+     * @example
+     * store.set(newValue)
+     */
     set(newValue: StoreType) {
         this.option.store.set(newValue)
     }
 
+    /**
+     * Set the store value to that value without recording.
+     * @param newValue
+     * @example
+     * store.setWithNoRecord(newValue)
+     */
     setWithNoRecord(newValue: StoreType & { ____ignoreRecordByOperational }) {
         if (newValue) {
             newValue.____ignoreRecordByOperational = true
@@ -78,10 +97,31 @@ export class Recordable<StoreType> implements IRecordable<string> {
         this.option.store.set(newValue)
     }
 
+    /**
+     * Update the store value through callback.
+     * @param callback
+     * @example
+     * store.update((storeValue) => {
+     *     // logic that transforms storeValue
+     *     // should be contained here.
+     *     return storeValue
+     * })
+     */
     update(callback: Interface.Updater<StoreType>) {
         this.option.store.update(callback)
     }
 
+
+    /**
+     * Update the store value through callback without recording.
+     * @param callback
+     * @example
+     * store.updateWithNoRecord((storeValue) => {
+     *     // logic that transforms storeValue
+     *     // should be contained here.
+     *     return storeValue
+     * })
+     */
     updateWithNoRecord(callback: Interface.Updater<StoreType>) {
         this.option.store.update(() => {
             const changedValue = callback()
@@ -94,6 +134,15 @@ export class Recordable<StoreType> implements IRecordable<string> {
         })
     }
 
+    /**
+     * When the value of the store is modified,
+     * it sends the value through the callback.
+     * @param run
+     * @example
+     * store.subscribe((storeValue) => {
+     *     // console.log(storeValue)
+     * })
+     */
     subscribe(
         run: Interface.Subscriber<StoreType>,
         invalidate: Interface.Invalidator<StoreType> = Utils.noop
@@ -101,6 +150,13 @@ export class Recordable<StoreType> implements IRecordable<string> {
         return this.option.store.subscribe(run, invalidate)
     }
 
+    /**
+     * Returns the store value to the previous value.
+     * @param diff
+     * @example
+     * store.undo() // When reverting to recorded diff value
+     * store.undo(diff) // When reverting to not recorded diff value
+     */
     undo(diff?: string) {
         if (!this.isCanUndo()) return false
 
@@ -143,6 +199,14 @@ export class Recordable<StoreType> implements IRecordable<string> {
             return false
         }
     }
+
+    /**
+     * Returns to the original value before reverting.
+     * @param diff
+     * @example
+     * store.redo() // When restoring to recorded diff value
+     * store.redo(diff) // When restoring to not recorded diff value
+     */
     redo(diff?: string) {
         if (!this.isCanRedo()) return false
 
@@ -184,16 +248,42 @@ export class Recordable<StoreType> implements IRecordable<string> {
             return false
         }
     }
+
+    /**
+     * This function check whether the store value
+     * can be reverting to its previous value.
+     * @example
+     * store.isCanUndo()
+     */
     isCanUndo() {
         if (!this.isRecording()) return false
         return (this.currentRecordIndex) > 0
     }
+
+    /**
+     * This function check whether the store value
+     * can be reverting to its before reverting value.
+     * @example
+     * store.isCanRedo()
+     */
     isCanRedo() {
         if (!this.isRecording()) return false
         if (this.records.length == 0) return false
         return this.currentRecordIndex < this.records.length
     }
 
+    /**
+     * It will be start the recording
+     * of the changing value of the store.
+     * 
+     * @param limit number
+     * @example
+     * store.startRecording()
+     * 
+     * // Record the number of records
+     * // with a limit of the given number.
+     * store.startRecording(limit)
+     */
     startRecording(limit?: number) {
         this.stopRecording()
         this.limit = limit
@@ -238,7 +328,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
 
                     if (this.limit) {
                         while (this.limit < this.records.length) {
-                            this.records.pop()
+                            this.records.shift()
                             this.event.emit(
                                 'recordsChanged',
                                 this.records,
@@ -255,15 +345,41 @@ export class Recordable<StoreType> implements IRecordable<string> {
                 } catch (e) { }
             })
     }
+
+    /**
+     * Stops recording changes in store values.
+    * @example
+    * store.stopRecording()
+     */
     stopRecording() {
         if (this.stopRecorder != undefined) {
             this.stopRecorder()
             this.stopRecorder = undefined
         }
     }
+
+    /**
+     * It returns whether changes in the
+     * store are being recording.
+     * @example
+     * store.isRecording()
+     */
     isRecording() {
         return this.stopRecorder != undefined
     }
+
+    /**
+     * Load the data into the store.
+     * @param recordData
+     * @example
+     * (async () => {
+     *     await store.load({
+     *          records, // string[]
+     *          currentRecordIndex, // number
+     *          storeValue, // any
+     *     })
+     * })()
+     */
     async load(recordData?: Interface.IRecordData<string>) {
         if (!recordData || !recordData.records) {
             if (!this.option.load) return false
@@ -273,7 +389,7 @@ export class Recordable<StoreType> implements IRecordable<string> {
 
                 this.records = loadedRecords.records
                 this.currentRecordIndex = loadedRecords.currentRecordIndex
-                this.option.store.set(loadedRecords.storeValue)
+                this.setWithNoRecord(loadedRecords.storeValue)
                 return true
             } catch (e) {
                 return false
@@ -281,34 +397,70 @@ export class Recordable<StoreType> implements IRecordable<string> {
         } else {
             this.records = recordData.records
             this.currentRecordIndex = recordData.currentRecordIndex
-            this.option.store.set(recordData.storeValue)
+            this.setWithNoRecord(recordData.storeValue)
         }
         return true
     }
+
+    /**
+     * It will be return the save data of the store.
+     * If a save callback is already declared at first time,
+     * save callback will be automatically called.
+     * @example
+     * (async () => {
+     *     let storeData = await store.save() // JSON Object
+     * })()
+     */
     async save() {
-        if (!this.option.save) return {
+        const saveData = {
             records: this.records,
             currentRecordIndex: this.currentRecordIndex,
             storeValue: this.option.store.get()
         }
+
         try {
-            await this.option.save({
-                records: this.records,
-                currentRecordIndex: this.currentRecordIndex,
-                storeValue: this.option.store.get()
-            })
+            if (this.option.save)
+                await this.option.save(saveData)
         } catch (e) { }
-        return
+        return saveData
     }
+
+    /**
+     * Returns the values of changes recorded.
+     * @returns string[]
+     * @example
+     * store.getRecords()
+     */
     getRecords() {
         return this.records
     }
+
+    /**
+     * Returns the single value of changes recorded.
+     * @returns string[]
+     * @example
+     * store.getRecords()
+     */
     getRecord(index: number) {
         return this.records[index]
     }
+
+    /**
+     * It returns the index value currently being referenced.
+     * If undo has never occurred, index will be
+     * refer to index that does not yet exist.
+     * @example
+     * store.getCurrentRecordIndex()
+     */
     getCurrentRecordIndex() {
         return this.currentRecordIndex
     }
+
+    /**
+     * Initializes all records loaded on the object.
+     *  @example
+     * store.clearRecords()
+     */
     clearRecords() {
         this.records = []
         this.currentRecordIndex = -1
@@ -319,7 +471,56 @@ export class Recordable<StoreType> implements IRecordable<string> {
         )
     }
 
+    /**
+     * It returns the event object.
+     * @example
+     * store.getEvent().on(...)
+     */
     getEvent() {
         return this.event
+    }
+    /**
+     * It returns interpreted history of changes in the object.
+     * @param diff 
+     * @param storeValue 
+     * @example
+     * const changelogs = store.changelogs(diff)
+     * 
+     * // If want to compare diffs with
+     * // objects at a specific point in time.
+     * const changelogs = store.changelogs(diff, storeValue)
+     */
+    changelogs(diff: string, storeValue?: any) {
+        if (storeValue !== undefined)
+            return SerializedOperational.changelogs(diff, storeValue)
+        return SerializedOperational.changelogs(diff, this.option.store.get())
+    }
+    /**
+     * It returns interpreted history of changes in the object.
+     * You can get the value of the desired format.
+     * @param diff 
+     * @param storeValue 
+     * @example
+     * const changelogs = store.changelogsFormatted(diff, 'console')
+     * 
+     * // If want to compare diffs with
+     * // objects at a specific point in time.
+     * const changelogs = store.changelogsFormatted(diff, 'html', storeValue)
+     */
+    changelogsFormatted(
+        diff: string,
+        format: 'annotated' | 'console' | 'html',
+        storeValue?: any) {
+        if (storeValue !== undefined)
+            return SerializedOperational.changelogsFormatted({
+                diff,
+                format,
+                original: storeValue,
+            })
+        return SerializedOperational.changelogsFormatted({
+            diff,
+            format,
+            original: this.option.store.get(),
+        })
     }
 }

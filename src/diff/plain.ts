@@ -47,7 +47,7 @@ export interface IChangeLogs {
 export const changelogs = (diff: JSONDiffPatch.Delta, original: any) => {
     try {
         // @ts-ignore
-        const result: IChangeLogs[] = CustomizedDiffPatch.formatters.jsonpatch.format(diff, original)
+        const result: IChangeLogs[] = JSONDiffPatch.formatters.jsonpatch.format(diff, original)
         if (!result) throw new Error()
         return result
     } catch (e) {
