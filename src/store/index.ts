@@ -114,7 +114,8 @@ export const recordable = <T>(
         autostart?: boolean,
         limit?: number
     }
-) => {
+) => { // TODO option 의 load 랑 save 반환 값 수정
+
     return new Recordable<T>({
         store: writable(value),
         load: option?.load,
