@@ -18,7 +18,7 @@ export interface IRecordable<T> {
 export interface IRecordableOption<T, StoreType> {
     store: Interface.Writable<StoreType>
     load?: (recordData?: Interface.IRecordData<T>) => Promise<undefined | Interface.IRecordData<T>>
-    save?: (recordData: Interface.IRecordData<T>) => Promise<undefined | Interface.IRecordData<T>>
+    save?: (recordData: Interface.IRecordData<T>) => Promise<boolean>
     autostart: boolean
     limit?: number
 }

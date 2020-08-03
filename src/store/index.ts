@@ -110,11 +110,11 @@ export const recordable = <T>(
     value: T,
     option?: {
         load?: (recordData?: Interface.IRecordData<string>) => Promise<undefined | Interface.IRecordData<string>>,
-        save?: (recordData: Interface.IRecordData<string>) => Promise<undefined | Interface.IRecordData<string>>,
+        save?: (recordData: Interface.IRecordData<string>) => Promise<boolean>,
         autostart?: boolean,
         limit?: number
     }
-) => { // TODO option 의 load 랑 save 반환 값 수정
+) => {
 
     return new Recordable<T>({
         store: writable(value),
